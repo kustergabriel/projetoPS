@@ -1,13 +1,15 @@
 package com.app.calingaertextend;
 
 public class Executor {
-        
+    // Isso aqui precisa passar para a main depois
     Memoria memoria = new Memoria(12);
     Registradores registradores = new Registradores();
+    Pilha pilha = new Pilha(12);
 
-    public Executor (Memoria memoria, Registradores registradores) {
+    public Executor (Memoria memoria, Registradores registradores, Pilha pilha) {
         this.memoria = memoria;
         this.registradores = registradores;
+        this.pilha = pilha;
     }
 
     public void executarPasso () throws AcessoIndevidoAMemoriaCheckedException {
@@ -23,7 +25,7 @@ public class Executor {
             op2 = memoria.getPosicaoMemoria(pc + 2); 
         }
         
-        Instrucoes.executar(opcode, op1, op2, registradores, memoria);
+        Instrucoes.executar(opcode, op1, op2, registradores, memoria, pilha);
 
     }
 }
