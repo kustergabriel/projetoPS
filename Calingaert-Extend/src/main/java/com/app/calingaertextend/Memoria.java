@@ -30,4 +30,10 @@ public class Memoria{
 		return this.tamanho;
 	}
 
+	public void imprimirMemoria () {
+		for (int i = 0; i < tamanho/32; i++) {
+			System.out.printf("Mem[%04d] = %d\n", i, memoria[i]);
+		}
+	}
+
 }
