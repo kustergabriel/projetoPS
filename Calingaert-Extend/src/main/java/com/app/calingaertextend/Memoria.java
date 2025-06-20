@@ -36,4 +36,8 @@ public class Memoria{
 		}
 	}
 
+	public int[] getMemoria(){
+		return memoria;
+	}
+
 }

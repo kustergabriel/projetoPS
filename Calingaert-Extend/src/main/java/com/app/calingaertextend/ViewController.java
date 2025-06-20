@@ -1,9 +1,14 @@
 package com.app.calingaertextend;
 
+import com.app.calingaertextend.UI.LinhaMemoria;
+import com.app.calingaertextend.UI.LinhaRegistrador;
+import javafx.beans.Observable;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.TilePane;
 
 
 import java.io.BufferedReader;
@@ -18,47 +23,73 @@ public class ViewController {
     private Button buttonAction;
 
     @FXML
+    private TitledPane memoria;
+
+    @FXML
+    private TableView<LinhaMemoria> tabelaMemoria;
+
+    @FXML
+    private TableColumn<LinhaMemoria, String> colunaEndereco;
+
+    @FXML
+    private TableColumn<LinhaMemoria, Integer> colunaValor;
+
+    private final ObservableList<LinhaMemoria> dadosMemoria = FXCollections.observableArrayList();
+
+    public void atualizarTabelaMemoria(int[] vetorMemoria) {
+        dadosMemoria.clear();
+        for (int i = 0; i < vetorMemoria.length; i++) {
+            String enderecoFormatado = String.format("%04d", i);
+            dadosMemoria.add(new LinhaMemoria(enderecoFormatado, vetorMemoria[i]));
+        }
+    }
+
+    @FXML
+    private TitledPane registrador;
+
+    @FXML
+    private TableView<LinhaRegistrador> tabelaDeRegistradores;
+
+    @FXML
+    private TableColumn<LinhaRegistrador, String> colunaRegistrador;
+
+    @FXML
+    private TableColumn<LinhaRegistrador, Integer> colunaValorRegistrador;
+
+    private final ObservableList<LinhaRegistrador> dados = FXCollections.observableArrayList();
+
+    public void atualizarTabela(Registradores registradores){
+        dados.setAll(
+                new LinhaRegistrador("PC", registradores.getPC()),
+                new LinhaRegistrador("SP", registradores.getSP()),
+                new LinhaRegistrador("ACC", registradores.getACC()),
+                new LinhaRegistrador("MOP", registradores.getMOP()),
+                new LinhaRegistrador("RI", registradores.getRI()),
+                new LinhaRegistrador("RE", registradores.getRE()),
+                new LinhaRegistrador("R0", registradores.getR0()),
+                new LinhaRegistrador("R1", registradores.getR1())
+        );
+    }
+    @FXML
+    public void initialize() {
+        colunaRegistrador.setCellValueFactory(new PropertyValueFactory<>("nome"));
+        colunaValorRegistrador.setCellValueFactory(new PropertyValueFactory<>("valor"));
+        colunaEndereco.setCellValueFactory(new PropertyValueFactory<>("endereco"));
+        colunaValor.setCellValueFactory(new PropertyValueFactory<>("valor"));
+        tabelaDeRegistradores.setItems(dados);
+        tabelaMemoria.setItems(dadosMemoria);
+    }
+
+
+    @FXML
     private TextArea codigo;
-
-    @FXML
-    private Label PC;
-
-    @FXML
-    private Label SP;
-
-    @FXML
-    private Label ACC;
-
-    @FXML
-    private Label MOP;
-
-    @FXML
-    private Label RI;
-
-    @FXML
-    private Label RE;
-
-    @FXML
-    private Label R0;
-
-    @FXML
-    private Label R1;
 
     @FXML
     private Button buttonAtualizarRegistradores;
 
     @FXML
     public void passo(){
-        Random random = new Random();
 
-        PC.setText(String.valueOf(random.nextInt(10)));
-        SP.setText(String.valueOf(random.nextInt(10)));
-        ACC.setText(String.valueOf(random.nextInt(10)));
-        MOP.setText(String.valueOf(random.nextInt(10)));
-        RI.setText(String.valueOf(random.nextInt(10)));
-        RE.setText(String.valueOf(random.nextInt(10)));
-        R0.setText(String.valueOf(random.nextInt(10)));
-        R1.setText(String.valueOf(random.nextInt(10)));
     }
 
     @FXML

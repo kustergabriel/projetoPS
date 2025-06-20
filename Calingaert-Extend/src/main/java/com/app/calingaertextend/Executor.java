@@ -11,6 +11,7 @@ public class Executor {
     private Memoria memoria;
     private Registradores registradores;
     private Pilha pilha;
+    private ViewController controller;
 
     public Executor (Memoria memoria, Registradores registradores, Pilha pilha) {
         this.memoria = memoria;
@@ -65,10 +66,16 @@ public class Executor {
         Instrucoes.executar(opcode, op1, op2, registradores, memoria, this, pilha);
 
         }
+        controller.atualizarTabela(registradores);
+        controller.atualizarTabelaMemoria(memoria.getMemoria());
     }
         
     public void pararExecucao () {
         this.executando = false;
+    }
+
+    public void setController(ViewController controller) {
+        this.controller = controller;
     }
 
 }
