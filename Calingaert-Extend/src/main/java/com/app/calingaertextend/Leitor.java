@@ -1,100 +1,93 @@
 package com.app.calingaertextend;
-import java.io.File;
-import java.io.FileNotFoundException;
+
+import java.io.*;
 import java.util.*;
 
-
-// é a classe que vai de fato ler o arquivo e separar linha por linha, tokenizar e indentificar o tipo e 
-//o conteudo da linha pra usar a outra classe ListaAsm
-
+// Classe que lê o arquivo e classifica cada linha
 public class Leitor {
-    private List<ListaAsm> linhasFeitas = new ArrayList();
-    private Set<String> macrosDefinidas = new HashSet <>();
+    private List<ListaAsm> linhasFeitas = new ArrayList<>();
+    private Set<String> macrosDefinidas = new HashSet<>();
 
-    public void lerArquivo (String caminho){ 
-
+    public void lerArquivo(String caminho) {
         System.out.println("\nProcessando: " + caminho);
-       try (Scanner scanner = new Scanner(new File(caminho))){
+
         boolean dentroMacro = false;
         String nomeMacroAtual = "";
         boolean aguardandoCabecalho = false;
-        
 
-            while (scanner.hasNextLine()){
-                String linhaOriginal = scanner.nextLine().trim();
-                String primeiraPalavra;
+        try (BufferedReader br = new BufferedReader(new FileReader(caminho))) {
+            String linhaOriginal;
 
-             if (linhaOriginal == null || linhaOriginal.isEmpty()){
-                continue; //aqui ve se a linha ta vazia ou se é comentário
+            while ((linhaOriginal = br.readLine()) != null) {
+                linhaOriginal = linhaOriginal.trim();
+                if (linhaOriginal.isEmpty() || linhaOriginal.startsWith("*")) {
+                    continue; // Ignora comentários e linhas vazias
                 }
-            if (linhaOriginal.startsWith("*")){
-                continue;
-            }
-            
-        
-            //tokeniza
-            String[] tokens = linhaOriginal.split("\\s+");
-            List <String> tokensLimpos = new ArrayList<>();
 
-            for (String token : tokens){
-                if (!token.isEmpty() && !token.startsWith("*")){
-                    tokensLimpos.add(token.toUpperCase());
-                } 
-            }
+                // Tokenização
+                String[] tokens = linhaOriginal.split("\\s+");
+                List<String> tokensLimpos = new ArrayList<>();
 
-            if (tokensLimpos.isEmpty()) continue;
-  
-            String tipo = "";
-            primeiraPalavra = tokensLimpos.get(0); //aqui é pra pegar o primeiro token da linha
-
-            if (primeiraPalavra.equalsIgnoreCase("MACRO")) {
-                tipo = "inicio_macro";
-                dentroMacro = true;
-                aguardandoCabecalho = true; 
-            
-            } else if (primeiraPalavra.equalsIgnoreCase("MEND")){
-                tipo = "fim_macro";
-                dentroMacro = false;
-                nomeMacroAtual = "";
-
-            } else if (dentroMacro && aguardandoCabecalho){
-                if (tokensLimpos.isEmpty()){
-                    System.err.println("Erro: Macro sem cabeçalho");
+                for (String token : tokens) {
+                    if (!token.isEmpty() && !token.startsWith("*")) {
+                        tokensLimpos.add(token.toUpperCase());
+                    }
                 }
-                tipo = "cabecalho_macro";
-                nomeMacroAtual = primeiraPalavra; //aq salva o nome da MACRO
-                macrosDefinidas.add(nomeMacroAtual);
-                aguardandoCabecalho = false;
 
-            } else if (dentroMacro){
-                tipo = "codigo_macro";
+                if (tokensLimpos.isEmpty()) continue;
 
-            } else if (macrosDefinidas.contains(primeiraPalavra)){
-                tipo = "chamada_macro";
+                String tipo = "";
+                String primeiraPalavra = tokensLimpos.get(0);
 
-            } else if (primeiraPalavra.endsWith(":")){
-                tipo = "label";
+                if (primeiraPalavra.equalsIgnoreCase("MACRO")) {
+                    tipo = "inicio_macro";
+                    dentroMacro = true;
+                    aguardandoCabecalho = true;
 
-            } else if (aguardandoCabecalho && tokensLimpos.isEmpty()) {
-    System.err.println("Erro: Macro sem cabeçalho");
+                } else if (primeiraPalavra.equalsIgnoreCase("MEND")) {
+                    tipo = "fim_macro";
+                    dentroMacro = false;
+                    nomeMacroAtual = "";
 
-            } else {
-                tipo = "codigo";
-            } 
-            linhasFeitas.add(new ListaAsm(linhaOriginal,tipo));
-          }
-          
-        } catch (FileNotFoundException e) {
-        System.out.println("Arquivo não reconhecido" + caminho);
-       }
+                } else if (dentroMacro && aguardandoCabecalho) {
+                    tipo = "cabecalho_macro";
+                    nomeMacroAtual = primeiraPalavra;
+                    macrosDefinidas.add(nomeMacroAtual);
+                    aguardandoCabecalho = false;
 
-    System.out.println("<<<<Linhas classificadas>>>>");
-    for (ListaAsm linha : linhasFeitas) {
-    System.out.println(linha.getTipo() + "" + linha.getConteudo());
-    System.out.println("Total de linhas: " + linhasFeitas.size());
+                } else if (dentroMacro) {
+                    tipo = "codigo_macro";
 
+                } else if (macrosDefinidas.contains(primeiraPalavra)) {
+                    tipo = "chamada_macro";
+
+                } else if (primeiraPalavra.endsWith(":")) {
+                    tipo = "label";
+
+                } else {
+                    tipo = "codigo";
+                }
+
+                linhasFeitas.add(new ListaAsm(linhaOriginal, tipo));
+            }
+
+        } catch (IOException e) {
+            System.err.println("Erro ao ler o arquivo: " + e.getMessage());
+        }
+
+        // Exibe as linhas classificadas
+        System.out.println("\n<<<< Linhas classificadas >>>>");
+        for (ListaAsm linha : linhasFeitas) {
+            System.out.println(linha.getTipo() + " -> " + linha.getConteudo());
+        }
+        System.out.println("Total de linhas: " + linhasFeitas.size());
     }
 
+
+    public List<ListaAsm> getLinhasFeitas() {
+    return linhasFeitas;
     }
+
+
 
 }

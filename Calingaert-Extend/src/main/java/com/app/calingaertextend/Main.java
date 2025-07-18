@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.List;
 
 import com.app.calingaertextend.montador.PrimeiraPassagem;
 import com.app.calingaertextend.montador.SegundaPassagem;
@@ -19,6 +20,8 @@ public class Main extends Application {
     public static Pilha pilha;
     public static Executor executor;
     public static ViewController controller;
+    public static Leitor leitor;
+    public static TabelaDeMacros tabela;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -45,8 +48,16 @@ public class Main extends Application {
 
         System.out.println(executor.gerarListaFormatada()); // Retorna uma lista, adicionei a variavel LINHA tambem, nao é necessario usar ela
 
-        String arquivoEntrada = "java/teste.txt"; 
+        String arquivoEntrada = "C:/Users/Gabriel Azevedo/Documents/GitHub/projetoPS/Calingaert-Extend/src/main/java/com/app/calingaertextend/montador/teste.txt";
         String arquivoSaida = "java/saida.txt";   
+
+        leitor = new Leitor();
+        leitor.lerArquivo(arquivoEntrada);
+
+        List<ListaAsm> linhasClassificadas = leitor.getLinhasFeitas();
+
+        tabela = new TabelaDeMacros();
+        tabela.processarMacros(linhasClassificadas);
 
         PrimeiraPassagem pp = new PrimeiraPassagem();
         SegundaPassagem sp = new SegundaPassagem();
