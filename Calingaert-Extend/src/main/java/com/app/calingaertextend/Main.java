@@ -7,11 +7,19 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.List;
-
+import com.app.calingaertextend.maquinavirtual.Executor;
+import com.app.calingaertextend.maquinavirtual.Memoria;
+import com.app.calingaertextend.maquinavirtual.Pilha;
+import com.app.calingaertextend.maquinavirtual.Registradores;
 import com.app.calingaertextend.montador.PrimeiraPassagem;
 import com.app.calingaertextend.montador.SegundaPassagem;
 import com.app.calingaertextend.montador.TabelaDeSimbolos;
 import com.app.calingaertextend.montador.TabelaInstrucao;
+import com.app.calingaertextend.processadordemacros.EscritorDeArquivo;
+import com.app.calingaertextend.processadordemacros.ExpansorDeMacros;
+import com.app.calingaertextend.processadordemacros.Leitor;
+import com.app.calingaertextend.processadordemacros.ListaAsm;
+import com.app.calingaertextend.processadordemacros.TabelaDeMacros;
 
 public class Main extends Application {
 
@@ -22,6 +30,7 @@ public class Main extends Application {
     public static ViewController controller;
     public static Leitor leitor;
     public static TabelaDeMacros tabela;
+    public static ExpansorDeMacros expansorDeMacros;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -48,9 +57,11 @@ public class Main extends Application {
 
         System.out.println(executor.gerarListaFormatada()); // Retorna uma lista, adicionei a variavel LINHA tambem, nao é necessario usar ela
 
-        String arquivoEntrada = "C:/Users/Gabriel Azevedo/Documents/GitHub/projetoPS/Calingaert-Extend/src/main/java/com/app/calingaertextend/montador/teste.txt";
-        String arquivoSaida = "java/saida.txt";   
+        String arquivoEntrada2 = "MASMAPRG.txt";
+        String arquivoEntrada = "Calingaert-Extend/src/main/java/com/app/calingaertextend/montador/teste3.txt";
+        String arquivoSaida = "Calingaert-Extend/src/main/java/com/app/calingaertextend/montador/saida.txt";   
 
+        // Processador de macros
         leitor = new Leitor();
         leitor.lerArquivo(arquivoEntrada);
 
@@ -59,15 +70,24 @@ public class Main extends Application {
         tabela = new TabelaDeMacros();
         tabela.processarMacros(linhasClassificadas);
 
+        expansorDeMacros = new ExpansorDeMacros(tabela);
+
+        List<String> codigoFinal = expansorDeMacros.expandir(linhasClassificadas);
+        for(String linha: codigoFinal){
+            System.out.println(linha);
+        }
+
+        EscritorDeArquivo escritor = new EscritorDeArquivo();
+        escritor.escreverArquivo("MASMAPRG.txt", codigoFinal);
+
+        // Macros antes das passagens
         PrimeiraPassagem pp = new PrimeiraPassagem();
         SegundaPassagem sp = new SegundaPassagem();
         TabelaDeSimbolos tabelaSimbolos = new TabelaDeSimbolos();
         TabelaInstrucao tabelaInstrucao = new TabelaInstrucao();
 
-        pp.primeirapassagem(arquivoEntrada, tabelaSimbolos, tabelaInstrucao);
-
-        sp.segundapassagem(arquivoEntrada, arquivoSaida, tabelaSimbolos, tabelaInstrucao);
-        
+        pp.primeirapassagem(arquivoEntrada2, tabelaSimbolos, tabelaInstrucao);
+        sp.segundapassagem(arquivoEntrada2, arquivoSaida, tabelaSimbolos, tabelaInstrucao);
     }
 
     public static void main(String[] args) {

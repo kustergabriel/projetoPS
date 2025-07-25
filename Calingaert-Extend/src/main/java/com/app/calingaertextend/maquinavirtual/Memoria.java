@@ -1,11 +1,11 @@
-package com.app.calingaertextend;
+package com.app.calingaertextend.maquinavirtual;
 
 public class Memoria{
 
 	private int[] memoria;
 	private int tamanho;
 
-	Memoria(int expoenteDe2){
+	public Memoria(int expoenteDe2){
 		this.tamanho = (int)Math.pow(2, expoenteDe2); // 2^12 = 4096 
 		this.memoria = new int[this.tamanho]; // 4096 posicoes de memoria
 		for(int i = 0; i < this.memoria.length; i++)

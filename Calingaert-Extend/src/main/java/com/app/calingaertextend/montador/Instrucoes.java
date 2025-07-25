@@ -1,11 +1,11 @@
 package com.app.calingaertextend.montador;
 
-import com.app.calingaertextend.Registradores;
-import com.app.calingaertextend.Memoria;
-import com.app.calingaertextend.Executor;
-import com.app.calingaertextend.Pilha;
-import com.app.calingaertextend.ModosEnderecamento;
-import com.app.calingaertextend.AcessoIndevidoAMemoriaCheckedException;
+import com.app.calingaertextend.maquinavirtual.Registradores;
+import com.app.calingaertextend.maquinavirtual.Memoria;
+import com.app.calingaertextend.maquinavirtual.Executor;
+import com.app.calingaertextend.maquinavirtual.Pilha;
+import com.app.calingaertextend.maquinavirtual.ModosEnderecamento;
+import com.app.calingaertextend.maquinavirtual.AcessoIndevidoAMemoriaCheckedException;
 
 class Instrucoes {
 
