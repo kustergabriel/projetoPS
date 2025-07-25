@@ -9,8 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.TilePane;
-
-
+import com.app.calingaertextend.maquinavirtual.Registradores;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;

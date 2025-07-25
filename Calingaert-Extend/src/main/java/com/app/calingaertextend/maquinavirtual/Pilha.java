@@ -1,11 +1,11 @@
-package com.app.calingaertextend;
+package com.app.calingaertextend.maquinavirtual;
 
 public class Pilha{
 
 	private int[] pilha;
 	private int tamanho;
 
-	Pilha(int expoenteDe2){
+	public Pilha(int expoenteDe2){
 		this.tamanho = (int)Math.pow(2, expoenteDe2);
 		this.pilha = new int[this.tamanho]; // 2^12 = 4096 posicoes de memoria
 		for(int i = 0; i < this.pilha.length; i++)

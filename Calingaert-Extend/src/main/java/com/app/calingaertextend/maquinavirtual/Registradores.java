@@ -1,4 +1,4 @@
-package com.app.calingaertextend;
+package com.app.calingaertextend.maquinavirtual;
 
 public class Registradores {
 	
@@ -11,7 +11,7 @@ public class Registradores {
 	private int R0; // registrador de proposito geral 1
 	private int R1; // registrador de proposito geral 2
 	
-	Registradores(){
+	public Registradores(){
 		PC = 0;
 		SP = 0;
 		ACC = 0;

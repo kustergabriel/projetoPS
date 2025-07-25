@@ -10,7 +10,7 @@
         STORE       &C
         MEND
         MACRO
-        DIVSC       &A,&B,&C
+        DIVSC       &A, &B, &C
         LOAD        &A
         DIV         &B
         SHIFTL      &RP
@@ -19,10 +19,10 @@
         MEND
 *
         MACRO
-&LAB    DISCR       &A,&B,&C,&D
-&LAB    MULTSC      &A,&C,TEMP1
-        MULTSC      TEMP1,@4,TEMP1
-        MULTSC      &A,&B,TEMP2
+&LAB    DISCR       &A, &B, &C, &D
+&LAB    MULTSC      &A, &C, TEMP1
+        MULTSC      TEMP1, @4, TEMP1
+        MULTSC      &A, &B, TEMP2
         SUB         TEMP1
         STORE       &D
         MEND
@@ -31,7 +31,7 @@
         READ        B
         READ        C
         SCALE       3
-        DISCR       A,B,C,D
+        DISCR       A, B, C, D
         WRITE       D
         STOP
 *
