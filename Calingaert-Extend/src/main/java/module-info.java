@@ -5,4 +5,6 @@ module com.app.calingaertextend {
     opens com.app.calingaertextend.UI to javafx.fxml, javafx.base;
     opens com.app.calingaertextend to javafx.fxml;
     exports com.app.calingaertextend;
+    exports com.app.calingaertextend.montador;
+    exports com.app.calingaertextend.maquinavirtual;
 }

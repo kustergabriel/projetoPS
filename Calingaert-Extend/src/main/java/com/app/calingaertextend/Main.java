@@ -42,6 +42,7 @@ public class Main extends Application {
 
         // Controller da Interface
         controller = fxmlLoader.getController();
+        controller.setStage(stage);
 
         memoria = new Memoria(12);
         registradores = new Registradores();
@@ -88,6 +89,7 @@ public class Main extends Application {
 
         pp.primeirapassagem(arquivoEntrada2, tabelaSimbolos, tabelaInstrucao);
         sp.segundapassagem(arquivoEntrada2, arquivoSaida, tabelaSimbolos, tabelaInstrucao);
+        controller.atualizarTabelaSimbolos(tabelaSimbolos);
     }
 
     public static void main(String[] args) {
