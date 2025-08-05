@@ -2,24 +2,29 @@ package com.app.calingaertextend;
 
 import com.app.calingaertextend.UI.LinhaMemoria;
 import com.app.calingaertextend.UI.LinhaRegistrador;
+import com.app.calingaertextend.UI.LinhaSimbolo;
+import com.app.calingaertextend.montador.Simbolos;
+import com.app.calingaertextend.montador.TabelaDeSimbolos;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import com.app.calingaertextend.maquinavirtual.Registradores;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.stream.Collectors;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import java.io.*;
 
 public class ViewController {
 
     @FXML
-    private Button buttonAction;
+    private TextArea codigoFonte;
 
     @FXML
-    private TitledPane memoria;
+    private TextArea codigoExpandido;
+
+    @FXML
+    private TextArea codigoMontado;
 
     @FXML
     private TableView<LinhaMemoria> tabelaMemoria;
@@ -32,17 +37,6 @@ public class ViewController {
 
     private final ObservableList<LinhaMemoria> dadosMemoria = FXCollections.observableArrayList();
 
-    public void atualizarTabelaMemoria(int[] vetorMemoria) {
-        dadosMemoria.clear();
-        for (int i = 0; i < vetorMemoria.length; i++) {
-            String enderecoFormatado = String.format("%04d", i);
-            dadosMemoria.add(new LinhaMemoria(enderecoFormatado, vetorMemoria[i]));
-        }
-    }
-
-    @FXML
-    private TitledPane registrador;
-
     @FXML
     private TableView<LinhaRegistrador> tabelaDeRegistradores;
 
@@ -53,6 +47,51 @@ public class ViewController {
     private TableColumn<LinhaRegistrador, Integer> colunaValorRegistrador;
 
     private final ObservableList<LinhaRegistrador> dados = FXCollections.observableArrayList();
+
+    @FXML
+    private TableView<LinhaSimbolo> tabelaDeSimbolos;
+
+    @FXML
+    private TableColumn<LinhaSimbolo, String> colunaSimboloNome;
+
+    @FXML
+    private TableColumn<LinhaSimbolo, Integer> colunaSimboloEndereco;
+
+    @FXML
+    private TableColumn<LinhaSimbolo, String> colunaSimboloTipo;
+
+    @FXML
+    private TableColumn<LinhaSimbolo, String> colunaSimboloStatus;
+
+    private final ObservableList<LinhaSimbolo> dadosSimbolos = FXCollections.observableArrayList();
+    private String codigoDeEntrada;
+
+    private Stage stage;
+
+    // inicializar os componentes da interface
+    @FXML
+    public void initialize() {
+        colunaRegistrador.setCellValueFactory(new PropertyValueFactory<>("nome"));
+        colunaValorRegistrador.setCellValueFactory(new PropertyValueFactory<>("valor"));
+        colunaEndereco.setCellValueFactory(new PropertyValueFactory<>("endereco"));
+        colunaValor.setCellValueFactory(new PropertyValueFactory<>("valor"));
+        tabelaDeRegistradores.setItems(dados);
+        tabelaMemoria.setItems(dadosMemoria);
+        tabelaDeSimbolos.setItems(dadosSimbolos);
+        colunaSimboloNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
+        colunaSimboloEndereco.setCellValueFactory(new PropertyValueFactory<>("endereco"));
+        colunaSimboloTipo.setCellValueFactory(new PropertyValueFactory<>("tipo"));
+        colunaSimboloStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+    }
+
+    //Metodos de atualizar a interface
+    public void atualizarTabelaMemoria(int[] vetorMemoria) {
+        dadosMemoria.clear();
+        for (int i = 0; i < vetorMemoria.length; i++) {
+            String enderecoFormatado = String.format("%04d", i);
+            dadosMemoria.add(new LinhaMemoria(enderecoFormatado, vetorMemoria[i]));
+        }
+    }
 
     public void atualizarTabela(Registradores registradores){
         dados.setAll(
@@ -66,43 +105,70 @@ public class ViewController {
                 new LinhaRegistrador("R1", registradores.getR1())
         );
     }
-    @FXML
-    public void initialize() {
-        colunaRegistrador.setCellValueFactory(new PropertyValueFactory<>("nome"));
-        colunaValorRegistrador.setCellValueFactory(new PropertyValueFactory<>("valor"));
-        colunaEndereco.setCellValueFactory(new PropertyValueFactory<>("endereco"));
-        colunaValor.setCellValueFactory(new PropertyValueFactory<>("valor"));
-        tabelaDeRegistradores.setItems(dados);
-        tabelaMemoria.setItems(dadosMemoria);
-    }
 
-
-    @FXML
-    private TextArea codigo;
-
-    @FXML
-    private Button buttonAtualizarRegistradores;
-
-    @FXML
-    public void passo(){
-
-    }
-
-    @FXML
-    public void onBtClick(){
-        try {
-            InputStream inputStream = getClass().getResourceAsStream("/arquivos/exemplo.txt");
-            if (inputStream != null) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-                String conteudo = reader.lines().collect(Collectors.joining("\n"));
-                codigo.setText(conteudo);
-            } else {
-                codigo.setText("Arquivo não encontrado.");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            codigo.setText("Erro ao carregar o arquivo.");
+    public void atualizarTabelaSimbolos(TabelaDeSimbolos tabelaDeSimbolos){
+        dadosSimbolos.clear();
+        for(Simbolos simbolo: tabelaDeSimbolos.getTodosSimbolos()){
+            LinhaSimbolo linha = new LinhaSimbolo(simbolo.getEndereco(), simbolo.getRotulo(), simbolo.getTipo(), simbolo.getStatus());
+            dadosSimbolos.add(linha);
         }
     }
-}
 
+    public void atualizarCodigoExpandido(String codigo){
+        codigoExpandido.setText(codigo);
+    }
+
+    public void atualizarCodigoMontado(String codigo){
+        codigoMontado.setText(codigo);
+    }
+
+    // botoes
+    @FXML
+    public void onReiniciarClick(){
+        codigoFonte.setText("");
+        codigoExpandido.setText("");
+        codigoMontado.setText("");
+    }
+
+    @FXML
+    public void onAbrirArquivoClick(){
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Selecione um arquivo");
+
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Arquivos de Texto", "*.txt"),
+                new FileChooser.ExtensionFilter("Todos os Arquivos", "*.*")
+        );
+
+        if (stage != null) {
+            File arquivoSelecionado = fileChooser.showOpenDialog(stage);
+            if (arquivoSelecionado != null) {
+                try {
+                    String codigo = java.nio.file.Files.readString(arquivoSelecionado.toPath());
+                    codigoFonte.setText(codigo);
+                } catch (IOException e) {
+                    System.err.println("Erro ao ler o arquivo: " + e.getMessage());
+                }
+            }
+        } else {
+            System.err.println("Stage não foi definido no controlador!");
+        }
+    }
+
+    @FXML
+    public void onMontarCodigoClick(){
+        codigoDeEntrada = codigoFonte.getText();
+        // chamar metodos para montar codigo
+    }
+
+    @FXML
+    public void onExecutarCodigoClick(){
+        // chamar metodos para executar codigo montado
+    }
+
+    //Getters e Setters
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
+}
