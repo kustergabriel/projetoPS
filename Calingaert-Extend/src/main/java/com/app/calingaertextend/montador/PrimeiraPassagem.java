@@ -7,10 +7,9 @@ import java.io.IOException;
 
 public class PrimeiraPassagem {
 
+    private boolean emEscopoLocal = false; // Variável para controlar o escopo local
 
-    public void primeirapassagem(String caminhoArquivo,
-                                 TabelaDeSimbolos tabelaSimbolos,
-                                 TabelaInstrucao tabelaInstrucao) {
+    public void primeirapassagem(String caminhoArquivo, TabelaDeSimbolos tabelaSimbolos, TabelaInstrucao tabelaInstrucao) {
 
         int locctr = 0;
         int linhaAtual = 0;
@@ -25,7 +24,7 @@ public class PrimeiraPassagem {
                 linhaAtual++;
                 linha = linha.trim();
 
-                // 1. Ignora linhas vazias ou de comentário.
+                // Ignora linhas vazias ou de comentário.
                 if (linha.isEmpty() || linha.startsWith("*")) {
                     continue;
                 }
@@ -33,27 +32,27 @@ public class PrimeiraPassagem {
                 // DEBUG: Imprime a linha que está a ser processada.
                 System.out.println("\n[Linha " + linhaAtual + "]: '" + linha + "' | locctr atual = " + locctr);
 
-                // 2. Lógica para pular o conteúdo das definições de macro.
+                // Lógica para pular o conteúdo das definições de macro.
                 if (linha.toUpperCase().startsWith("MACRO")) {
                     emDefinicaoDeMacro = true;
-                    System.out.println("  -> Detetado início de MACRO. A ignorar conteúdo.");
+                    System.out.println("  -> Detectado início de MACRO. A ignorar conteúdo.");
                     continue;
                 }
                 if (linha.toUpperCase().startsWith("MEND")) {
                     emDefinicaoDeMacro = false;
-                    System.out.println("  -> Detetado fim de MEND.");
+                    System.out.println("  -> Detectado fim de MEND.");
                     continue;
                 }
                 if (emDefinicaoDeMacro) {
                     continue;
                 }
 
-                // 3. Divide a linha em partes (tokens) para análise.
+                // Divide a linha em partes (tokens) para análise.
                 String[] partes = linha.split("\\s+");
                 String rotulo = null;
                 String instrucaoOuDiretiva = null;
-                
-                // 4. Lógica para identificar se a primeira palavra é um rótulo.
+
+                // Lógica para identificar se a primeira palavra é um rótulo.
                 if (!tabelaInstrucao.contains(partes[0].toUpperCase())) {
                     rotulo = partes[0];
                     if (partes.length > 1) {
@@ -63,25 +62,34 @@ public class PrimeiraPassagem {
                     instrucaoOuDiretiva = partes[0].toUpperCase();
                 }
 
+                // Verifica se estamos iniciando ou terminando um escopo local
+                if (instrucaoOuDiretiva != null) {
+                    if (instrucaoOuDiretiva.equals("PROC")) {
+                        emEscopoLocal = true; // Entrando em um escopo local
+                    } else if (instrucaoOuDiretiva.equals("ENDPROC")) {
+                        emEscopoLocal = false; // Saindo do escopo local
+                    }
+                }
+
                 // Bloco de segurança para corrigir má identificação de START/END.
                 if (rotulo != null && (rotulo.equalsIgnoreCase("START") || rotulo.equalsIgnoreCase("END"))) {
                     instrucaoOuDiretiva = rotulo.toUpperCase();
                     rotulo = null;
                 }
 
-                // 5. Trata as diretivas de controle START e END.
+                // Trata as diretivas de controle START e END.
                 if (instrucaoOuDiretiva != null) {
                     if (instrucaoOuDiretiva.equals("START")) {
                         System.out.println("  -> Processando diretiva START.");
                         if (partes.length > 1) {
-                           try {
-                               locctr = Integer.parseInt(rotulo == null ? partes[1] : partes[2]);
-                           } catch (NumberFormatException nfe) {
-                               locctr = 0;
-                           }
+                            try {
+                                locctr = Integer.parseInt(rotulo == null ? partes[1] : partes[2]);
+                            } catch (NumberFormatException nfe) {
+                                locctr = 0;
+                            }
                         }
                         if (rotulo != null) {
-                            tabelaSimbolos.adicionarSimbolo(rotulo, locctr, "PROGRAMA", "DEFINIDO");
+                            tabelaSimbolos.adicionarSimbolo(rotulo, locctr, "PROGRAMA", "DEFINIDO", !emEscopoLocal);
                         }
                         continue;
                     } else if (instrucaoOuDiretiva.equals("END")) {
@@ -90,18 +98,18 @@ public class PrimeiraPassagem {
                     }
                 }
 
-                // 6. Adiciona o rótulo (se existir) na Tabela de Símbolos com o endereço ATUAL.
+                // Adiciona o rótulo (se existir) na Tabela de Símbolos com o endereço ATUAL.
                 if (rotulo != null) {
+                    boolean isGlobal = !emEscopoLocal; // Se não estamos em um escopo local, é global
                     if (!tabelaSimbolos.contemSimbolo(rotulo)) {
                         System.out.println("  -> ADICIONANDO SÍMBOLO: (" + rotulo + ", " + locctr + ")");
-                        tabelaSimbolos.adicionarSimbolo(rotulo, locctr, "LABEL", "DEFINIDO");
+                        tabelaSimbolos.adicionarSimbolo(rotulo, locctr, "LABEL", "DEFINIDO", isGlobal);
                     } else {
                         System.err.println("Erro na linha " + linhaAtual + ": Símbolo duplicado '" + rotulo + "'.");
                     }
                 }
 
-                // 7.  LÓGICA DE INCREMENTO FINAL
-                // Incrementa o locctr de acordo com o tamanho real da instrução ou diretiva.
+                // Lógica de incremento final
                 if (instrucaoOuDiretiva != null) {
                     int tamanho = tabelaInstrucao.getInstructionSize(instrucaoOuDiretiva);
                     if (tamanho > 0) {

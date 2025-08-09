@@ -6,14 +6,21 @@ public class Simbolos {
     private int endereco;
     private String tipo;
     private String status;
+    private boolean isGlobal;
+    
 
-    public Simbolos(String rotulo, int endereco, String tipo, String status) {
-        this.rotulo = rotulo;
+    public Simbolos(String rotulo, int endereco, String tipo, String status, boolean isGlobal) {
+        this.rotulo = rotulo; // = nome do símbolo
         this.endereco = endereco;
         this.tipo = tipo;
         this.status = status;
+        this.isGlobal = isGlobal; // indica se o símbolo é global ou não
     }
 
+    public boolean isGlobal() {
+        return isGlobal;
+    }
+    
     public String getRotulo() {
         return this.rotulo;
     }

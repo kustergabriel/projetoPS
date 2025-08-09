@@ -18,7 +18,7 @@ import java.io.*;
 public class ViewController {
 
     @FXML
-    private TextArea codigoFonte;
+    public TextArea codigoFonte;
 
     @FXML
     private TextArea codigoExpandido;

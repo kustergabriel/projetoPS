@@ -12,13 +12,13 @@ public class TabelaDeSimbolos {
         simbolos = new LinkedHashMap<>();
     }
 
-    public void adicionarSimbolo(String nome, int endereco, String tipo, String status) {
+    public void adicionarSimbolo(String nome, int endereco, String tipo, String status, boolean isGlobal) {
         if (!simboloValido(nome)) {
             throw new RuntimeException("Símbolo inválido: " + nome + " (Máx 8 caracteres, inicia com letra, alfanumérico)");
         }
 
         if (!simbolos.containsKey(nome)) {
-            simbolos.put(nome, new Simbolos(nome, endereco, tipo, status));
+            simbolos.put(nome, new Simbolos(nome, endereco, tipo, status, isGlobal));
         }
     }
 
