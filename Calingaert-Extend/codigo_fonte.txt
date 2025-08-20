@@ -1,12 +1,1 @@
-START BRANCHTEST
-    LOAD    VAL_A     * ACC = 10
-    SUB     VAL_B     * ACC = 10 - 7 = 3
-    BRPOS   SKIP      * Como ACC (3) > 0, o programa deve pular para o label SKIP
-    WRITE   NEGATIVO  * Esta linha DEVE ser pulada
-SKIP    WRITE   POSITIVO  * O programa deve executar esta linha
-    STOP
-
-VAL_A     CONST   10
-VAL_B     CONST   7
-NEGATIVO  CONST   -1        * Um valor para indicar que o desvio falhou
-POSITIVO  CONST   1         * Um valor para indicar que o desvio funcionou
+dfsd

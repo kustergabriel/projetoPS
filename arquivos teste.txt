@@ -1,0 +1,61 @@
+
+
+* Teste de movimentacao de dados com COPY
+START COPY_TEST
+    COPY    ORIGEM DESTINO  * Copia o valor de ORIGEM (42) para DESTINO
+    WRITE   DESTINO         * Escreve o valor de DESTINO (agora 42)
+    STOP
+
+ORIGEM  CONST   42
+DESTINO SPACE
+
+
+
+* Teste de Desvio Condicional (BRPOS)
+START BRANCHTEST
+    LOAD    VAL_A     * ACC = 10
+    SUB     VAL_B     * ACC = 10 - 7 = 3
+    BRPOS   SKIP      * Como ACC (3) > 0, o programa deve pular para o label SKIP
+    WRITE   NEGATIVO  * Esta linha DEVE ser pulada
+SKIP    WRITE   POSITIVO  * O programa deve executar esta linha
+    STOP
+
+VAL_A     CONST   10
+VAL_B     CONST   7
+NEGATIVO  CONST   -1        * Um valor para indicar que o desvio falhou
+POSITIVO  CONST   1         * Um valor para indicar que o desvio funcionou
+
+
+START SUB_TEST
+    LOAD    VAL1      * ACC = 10
+    CALL    ROTINA    * Chama a sub-rotina no endereco 'ROTINA'
+    ADD     VAL2      * Esta linha e executada APOS o retorno. ACC = 20 + 5 = 25
+    STORE   RESULT    * Armazena o resultado final
+    STOP
+
+ROTINA  LOAD    VAL_ROT * ACC = 20 (dentro da rotina)
+    RET               * Retorna para a instrucao apos o CALL
+
+VAL1      CONST   10
+VAL2      CONST   5
+VAL_ROT   CONST   20
+RESULT    SPACE
+
+
+* Teste de manipulacao da pilha com PUSH e POP
+START STACK_TEST
+    LOAD    VALOR     * ACC = 77
+    STORE   TEMP      * Salva o valor em uma variavel
+    PUSH    TEMP      * Empilha o valor de TEMP (77)
+    LOAD    ZERO      * Zera o ACC para provar que o valor sera recuperado
+    POP     DESTINO   * Desempilha o valor (77) para a variavel DESTINO
+    WRITE   DESTINO   * Escreve o valor recuperado. Deve ser 77
+    STOP
+
+VALOR   CONST   77
+ZERO    CONST   0
+TEMP    SPACE
+DESTINO SPACE
+
+
+
