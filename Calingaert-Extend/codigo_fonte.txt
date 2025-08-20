@@ -1,14 +1,12 @@
-* Teste de manipulacao da pilha com PUSH e POP
-START STACK_TEST
-    LOAD    VALOR     * ACC = 77
-    STORE   TEMP      * Salva o valor em uma variavel
-    PUSH    TEMP      * Empilha o valor de TEMP (77)
-    LOAD    ZERO      * Zera o ACC para provar que o valor sera recuperado
-    POP     DESTINO   * Desempilha o valor (77) para a variavel DESTINO
-    WRITE   DESTINO   * Escreve o valor recuperado. Deve ser 77
+START BRANCHTEST
+    LOAD    VAL_A     * ACC = 10
+    SUB     VAL_B     * ACC = 10 - 7 = 3
+    BRPOS   SKIP      * Como ACC (3) > 0, o programa deve pular para o label SKIP
+    WRITE   NEGATIVO  * Esta linha DEVE ser pulada
+SKIP    WRITE   POSITIVO  * O programa deve executar esta linha
     STOP
 
-VALOR   CONST   77
-ZERO    CONST   0
-TEMP    SPACE
-DESTINO SPACE
+VAL_A     CONST   10
+VAL_B     CONST   7
+NEGATIVO  CONST   -1        * Um valor para indicar que o desvio falhou
+POSITIVO  CONST   1         * Um valor para indicar que o desvio funcionou

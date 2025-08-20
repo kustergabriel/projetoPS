@@ -34,9 +34,10 @@ public class TabelaDeSimbolos {
    public static boolean simboloValido(String nome) {
     // Permite símbolo iniciar com &, depois aplica regra original
     if (nome.startsWith("&")) {
-        nome = nome.substring(1); // remove o &
+        nome = nome.substring(1); // remove o & 
     }
-    return nome.matches("^[A-Za-z][A-Za-z0-9]{0,7}$");
+    // A expressão regular foi modificada para incluir o underscore '_'
+    return nome.matches("^[A-Za-z][A-Za-z0-9_]{0,7}$");
 }
 
     public void imprimirTabela() {

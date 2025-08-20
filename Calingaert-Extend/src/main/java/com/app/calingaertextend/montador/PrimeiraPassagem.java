@@ -21,11 +21,19 @@ public class PrimeiraPassagem {
             System.out.println("\n--- A iniciar Primeira Passagem (com cálculo de tamanho) ---");
 
             while ((linha = br.readLine()) != null) {
-                linhaAtual++;
-                linha = linha.trim();
 
                 // Ignora linhas vazias ou de comentário.
-                if (linha.isEmpty() || linha.startsWith("*")) {
+                linhaAtual++;
+                
+                // Remove o comentário em linha ANTES de qualquer outra coisa
+                int commentIndex = linha.indexOf('*');
+                if (commentIndex != -1) {
+                    linha = linha.substring(0, commentIndex);
+                }
+
+                linha = linha.trim();
+
+                if (linha.isEmpty()) {
                     continue;
                 }
 

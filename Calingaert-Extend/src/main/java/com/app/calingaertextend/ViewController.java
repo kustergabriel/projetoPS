@@ -14,61 +14,44 @@ import com.app.calingaertextend.maquinavirtual.Registradores;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.*;
+import java.nio.file.Files;
 
 public class ViewController {
 
     @FXML
     public TextArea codigoFonte;
-
     @FXML
     private TextArea codigoExpandido;
-
     @FXML
     private TextArea codigoMontado;
-
     @FXML
     private TableView<LinhaMemoria> tabelaMemoria;
-
     @FXML
     private TableColumn<LinhaMemoria, String> colunaEndereco;
-
     @FXML
     private TableColumn<LinhaMemoria, Integer> colunaValor;
-
     private final ObservableList<LinhaMemoria> dadosMemoria = FXCollections.observableArrayList();
-
     @FXML
     private TableView<LinhaRegistrador> tabelaDeRegistradores;
-
     @FXML
     private TableColumn<LinhaRegistrador, String> colunaRegistrador;
-
     @FXML
     private TableColumn<LinhaRegistrador, Integer> colunaValorRegistrador;
-
     private final ObservableList<LinhaRegistrador> dados = FXCollections.observableArrayList();
-
     @FXML
     private TableView<LinhaSimbolo> tabelaDeSimbolos;
-
     @FXML
     private TableColumn<LinhaSimbolo, String> colunaSimboloNome;
-
     @FXML
     private TableColumn<LinhaSimbolo, Integer> colunaSimboloEndereco;
-
     @FXML
     private TableColumn<LinhaSimbolo, String> colunaSimboloTipo;
-
     @FXML
     private TableColumn<LinhaSimbolo, String> colunaSimboloStatus;
-
     private final ObservableList<LinhaSimbolo> dadosSimbolos = FXCollections.observableArrayList();
-    private String codigoDeEntrada;
-
     private Stage stage;
+    private Main mainApp;
 
-    // inicializar os componentes da interface
     @FXML
     public void initialize() {
         colunaRegistrador.setCellValueFactory(new PropertyValueFactory<>("nome"));
@@ -84,7 +67,6 @@ public class ViewController {
         colunaSimboloStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
     }
 
-    //Metodos de atualizar a interface
     public void atualizarTabelaMemoria(int[] vetorMemoria) {
         dadosMemoria.clear();
         for (int i = 0; i < vetorMemoria.length; i++) {
@@ -122,19 +104,23 @@ public class ViewController {
         codigoMontado.setText(codigo);
     }
 
-    // botoes
     @FXML
     public void onReiniciarClick(){
         codigoFonte.setText("");
         codigoExpandido.setText("");
         codigoMontado.setText("");
+
+        // Limpa os dados das três tabelas
+        dados.clear();
+        dadosMemoria.clear();
+        dadosSimbolos.clear();
+
     }
 
     @FXML
     public void onAbrirArquivoClick(){
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Selecione um arquivo");
-
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Arquivos de Texto", "*.txt"),
                 new FileChooser.ExtensionFilter("Todos os Arquivos", "*.*")
@@ -144,7 +130,7 @@ public class ViewController {
             File arquivoSelecionado = fileChooser.showOpenDialog(stage);
             if (arquivoSelecionado != null) {
                 try {
-                    String codigo = java.nio.file.Files.readString(arquivoSelecionado.toPath());
+                    String codigo = Files.readString(arquivoSelecionado.toPath());
                     codigoFonte.setText(codigo);
                 } catch (IOException e) {
                     System.err.println("Erro ao ler o arquivo: " + e.getMessage());
@@ -157,18 +143,32 @@ public class ViewController {
 
     @FXML
     public void onMontarCodigoClick(){
-        codigoDeEntrada = codigoFonte.getText();
-        // chamar metodos para montar codigo
+        String codigoDeEntrada = codigoFonte.getText();
+        if (mainApp != null && !codigoDeEntrada.isEmpty()) {
+            mainApp.executarProcessoCompleto(codigoDeEntrada);
+        }
     }
 
     @FXML
     public void onExecutarCodigoClick(){
-        // chamar metodos para executar codigo montado
+        if (mainApp != null && !codigoMontado.getText().isEmpty()) {
+            mainApp.carregarEExecutar();
+        }
     }
 
-    //Getters e Setters
     public void setStage(Stage stage) {
         this.stage = stage;
     }
 
+    public void setMainApp(Main mainApp) {
+        this.mainApp = mainApp;
+    }
+        // *** MÉTODO DE ERRO ADICIONADO ***
+    public void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 }

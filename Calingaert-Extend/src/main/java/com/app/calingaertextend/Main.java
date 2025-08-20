@@ -1,17 +1,19 @@
 package com.app.calingaertextend;
+
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.File;
-import java.util.Arrays;
-import java.util.Map;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import com.app.calingaertextend.montador.*;
 import com.app.calingaertextend.processadordemacros.*;
 import com.app.calingaertextend.maquinavirtual.*;
-
 
 public class Main extends Application {
 
@@ -20,9 +22,6 @@ public class Main extends Application {
     public static Pilha pilha;
     public static Executor executor;
     public static ViewController controller;
-    public static Leitor leitor;
-    public static TabelaDeMacros tabela;
-    public static ExpansorDeMacros expansorDeMacros;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -32,121 +31,102 @@ public class Main extends Application {
         stage.setTitle("Calingaert Extend");
         stage.show();
 
-        // Controller da Interface
         controller = fxmlLoader.getController();
         controller.setStage(stage);
+        controller.setMainApp(this);
 
-        memoria = new Memoria(12);
-        registradores = new Registradores();
         pilha = new Pilha(12);
-        executor = new Executor(memoria, registradores, pilha);
+    }
 
-        // Passar o controller para o executor atualizar os dados no futuro
-        executor.setController(controller);
+    public void executarProcessoCompleto(String codigoFonte) {
+        try {
+            String arquivoFonteOriginal = "codigo_fonte.txt";
+            String arquivoExpandido = "MASMAPRG.txt";
+            String arquivoObjetoMontado = "saida.obj";
+            String arquivoExecutavel = "programa.hpx"; // O arquivo final e limpo
 
-        // Iniciar tabelas
-        controller.atualizarTabela(registradores);
-        controller.atualizarTabelaMemoria(memoria.getMemoria());
+            Files.writeString(java.nio.file.Paths.get(arquivoFonteOriginal), codigoFonte);
 
-        System.out.println(executor.gerarListaFormatada()); // Retorna uma lista, adicionei a variavel LINHA tambem, nao é necessario usar ela
+            // 1. Processador de Macros
+            Leitor leitor = new Leitor();
+            leitor.lerArquivo(arquivoFonteOriginal);
+            TabelaDeMacros tabelaDeMacros = new TabelaDeMacros();
+            tabelaDeMacros.processarMacros(leitor.getLinhasFeitas());
+            ExpansorDeMacros expansorDeMacros = new ExpansorDeMacros(tabelaDeMacros);
+            List<String> codigoFinalExpandido = expansorDeMacros.expandir(leitor.getLinhasFeitas());
+            new EscritorDeArquivo().escreverArquivo(arquivoExpandido, codigoFinalExpandido);
+            Platform.runLater(() -> controller.atualizarCodigoExpandido(String.join("\n", codigoFinalExpandido)));
 
-        String arquivoFonteOriginal = "Calingaert-Extend/src/main/java/com/app/calingaertextend/montador/teste3.txt";
-        String arquivoExpandido = "MASMAPRG.txt"; // Saída do processador de macros, entrada do montador
-        String arquivoObjetoMontado = "Calingaert-Extend/src/main/java/com/app/calingaertextend/montador/saida.txt"; // Saída do montador
-        String arquivoExecutavel = "programa.hpx"; // Saída do ligador
+            // 2. Montador
+            TabelaDeSimbolos tabelaSimbolos = new TabelaDeSimbolos();
+            TabelaInstrucao tabelaInstrucao = new TabelaInstrucao();
+            new PrimeiraPassagem().primeirapassagem(arquivoExpandido, tabelaSimbolos, tabelaInstrucao);
+            new SegundaPassagem().segundapassagem(arquivoExpandido, arquivoObjetoMontado, tabelaSimbolos, tabelaInstrucao);
+            Platform.runLater(() -> controller.atualizarTabelaSimbolos(tabelaSimbolos));
 
-        // 1. Processador de Macros
-        System.out.println("\n--- Iniciando Processador de Macros ---");
-        leitor = new Leitor();
-        leitor.lerArquivo(arquivoFonteOriginal);
-        List<ListaAsm> linhasClassificadas = leitor.getLinhasFeitas();
+            // 3. Ligador
+            List<File> modulosObjeto = Arrays.asList(new File(arquivoObjetoMontado));
+            Map<String, Integer> tabelaGlobal = new LigadorPrimeiraPassagem().executarPassagem(modulosObjeto);
+            new LigadorSegundaPassagem(tabelaGlobal).executarPassagem(modulosObjeto, arquivoExecutavel);
 
-        tabela = new TabelaDeMacros();
-        tabela.processarMacros(linhasClassificadas);
+            // *** CORREÇÃO APLICADA AQUI ***
+            // Exibe o conteúdo do arquivo final e limpo (programa.hpx)
+            final String codigoFinalStr = Files.readString(java.nio.file.Paths.get(arquivoExecutavel));
+            Platform.runLater(() -> controller.atualizarCodigoMontado(codigoFinalStr));
 
-        expansorDeMacros = new ExpansorDeMacros(tabela);
-        List<String> codigoFinalExpandido = expansorDeMacros.expandir(linhasClassificadas);
-        
-        EscritorDeArquivo escritorMacros = new EscritorDeArquivo();
-        escritorMacros.escreverArquivo(arquivoExpandido, codigoFinalExpandido);
-        System.out.println("--- Processador de Macros Concluído ---");
+        } catch (Exception e) {
+            e.printStackTrace();
+            Platform.runLater(() -> controller.showError("Erro de Processamento", "Ocorreu um erro durante a montagem: \n" + e.getMessage()));
+        }
+    }
 
-        // 2. Montador (Primeira e Segunda Passagem)
-        System.out.println("\n--- Iniciando Montador ---");
-        PrimeiraPassagem pp = new PrimeiraPassagem();
-        SegundaPassagem sp = new SegundaPassagem();
-        TabelaDeSimbolos tabelaSimbolos = new TabelaDeSimbolos();
-        TabelaInstrucao tabelaInstrucao = new TabelaInstrucao();
+    public void carregarEExecutar() {
+        try {
+            // Reinicia a VM
+            memoria = new Memoria(12);
+            registradores = new Registradores();
+            executor = new Executor(memoria, registradores, pilha);
+            executor.setController(controller);
 
-        pp.primeirapassagem(arquivoExpandido, tabelaSimbolos, tabelaInstrucao);
-        sp.segundapassagem(arquivoExpandido, arquivoObjetoMontado, tabelaSimbolos, tabelaInstrucao);
-        controller.atualizarTabelaSimbolos(tabelaSimbolos); // Atualiza a UI com a tabela de símbolos
-        System.out.println("--- Montador Concluído ---");
+            // *** CORREÇÃO APLICADA AQUI ***
+            // Carrega o arquivo final e limpo (programa.hpx) para a memória
+            String arquivoExecutavel = "programa.hpx";
+            List<String> linhasDoExecutavel = Files.readAllLines(java.nio.file.Paths.get(arquivoExecutavel));
 
-        // 3. Ligador (Primeira e Segunda Passagem)
-        System.out.println("\n--- Iniciando Ligador ---");
-        // Para este exemplo, assumimos que 'saida.txt' é o único módulo objeto.
-        // Em um cenário real, você teria vários arquivos .obj
-        List<File> modulosObjeto = Arrays.asList(new File(arquivoObjetoMontado));
-
-        LigadorPrimeiraPassagem ligadorPP = new LigadorPrimeiraPassagem();
-        Map<String, Integer> tabelaGlobal = ligadorPP.executarPassagem(modulosObjeto);
-
-        LigadorSegundaPassagem ligadorSP = new LigadorSegundaPassagem(tabelaGlobal);
-        ligadorSP.executarPassagem(modulosObjeto, arquivoExecutavel);
-        System.out.println("--- Ligador Concluído ---");
-
-        // 4. Carregador e Execução na Máquina Virtual
-        System.out.println("\n--- Iniciando Carregador e Execução ---");
-        LeitorObjeto leitorExecutavel = new LeitorObjeto();
-        LeitorObjeto.ModuloObjeto programaCarregado = leitorExecutavel.lerArquivoObjeto(arquivoExecutavel);
-
-        if (programaCarregado != null) {
-            // Carregar o código objeto na memória da máquina virtual
-            // O formato do arquivo .hpx (saida.txt) é crucial aqui.
-            // Assumindo que cada linha em codigoObjeto é uma instrução/dado
-            int enderecoAtual = 0; // Endereço de carga, pode ser 0 ou um endereço base definido
-            for (String linhaCodigo : programaCarregado.codigoObjeto) {
-                // Aqui você precisaria parsear a linha (opcode e operandos)
-                // e colocar na memória. O formato atual de saida.txt é "OPCODE OPERANDO1 OPERANDO2"
-                String[] partesCodigo = linhaCodigo.split("\\s+");
-                try {
-                    // Coloca o opcode
-                    memoria.setPosicaoMemoria(enderecoAtual++, Integer.parseInt(partesCodigo[0]));
-                    // Coloca os operandos, se existirem
-                    for (int i = 1; i < partesCodigo.length; i++) {
-                        memoria.setPosicaoMemoria(enderecoAtual++, Integer.parseInt(partesCodigo[i]));
-                    }
-                } catch (NumberFormatException e) {
-                    System.err.println("Erro ao parsear código objeto: " + linhaCodigo);
-                } catch (AcessoIndevidoAMemoriaCheckedException e) {
-                    System.err.println("Erro de acesso à memória ao carregar programa: " + e.getMessage());
+            int enderecoAtual = 0;
+            for (String linha : linhasDoExecutavel) {
+                if (linha.trim().isEmpty()) continue;
+                String[] partes = linha.trim().split("\\s+");
+                for (String parte : partes) {
+                    memoria.setPosicaoMemoria(enderecoAtual++, Integer.parseInt(parte));
                 }
             }
-
-            // Definir o PC inicial para o endereço de execução do programa
-            // O PDF menciona que o ligador informa o endereço inicial para execução.
-            // No seu LeitorObjeto.ModuloObjeto, você tem 'enderecoInicial'.
-            // Se o programa for carregado a partir do endereço 0 da memória, o PC inicial será o 'enderecoInicial' do módulo.
-            registradores.setPC(programaCarregado.enderecoInicial); 
             
-            // Atualizar a UI com a memória carregada
-            controller.atualizarTabelaMemoria(memoria.getMemoria());
-            controller.atualizarTabela(registradores);
+            registradores.setPC(0);
 
-            // Executar o programa
-            try {
-                executor.executarPasso(); // Isso executará o programa carregado
-            } catch (AcessoIndevidoAMemoriaCheckedException e) {
-                System.err.println("Erro durante a execução do programa: " + e.getMessage());
-            }
-        } else {
-            System.err.println("Não foi possível carregar o programa executável.");
+            // Atualiza a UI com o estado inicial
+            Platform.runLater(() -> {
+                controller.atualizarTabelaMemoria(memoria.getMemoria());
+                controller.atualizarTabela(registradores);
+            });
+
+            // Executa em segundo plano
+            new Thread(() -> {
+                try {
+                    executor.executarPasso();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Platform.runLater(() -> controller.showError("Erro de Execução", "Aconteceu um erro na Máquina Virtual: \n" + e.getMessage()));
+                }
+            }).start();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Platform.runLater(() -> controller.showError("Erro de Carga", "Não foi possível carregar o programa para execução: \n" + e.getMessage()));
         }
-        System.out.println("--- Carregador e Execução Concluídos ---");
     }
 
     public static void main(String[] args) {
-        launch();
+        launch(args);
     }
 }

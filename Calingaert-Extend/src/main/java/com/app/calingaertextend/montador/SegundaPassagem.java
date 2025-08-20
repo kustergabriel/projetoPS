@@ -5,8 +5,6 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 //package com.app.calingaertextend;
 
@@ -37,11 +35,19 @@ public class SegundaPassagem {
 
             while ((linha = br.readLine()) != null) {
                 linhaAtual++;
-                linha = linha.trim();
 
-                if (linha.isEmpty() || linha.startsWith("*")) {
+                // Remove o comentário em linha ANTES de qualquer outra coisa
+                int commentIndex = linha.indexOf('*');
+                if (commentIndex != -1) {
+                    linha = linha.substring(0, commentIndex);
+                }
+
+                linha = linha.trim();
+                    
+                if (linha.isEmpty()) {
                     continue;
                 }
+                
                 if (linha.toUpperCase().startsWith("MACRO")) {
                     emDefinicaoDeMacro = true;
                     continue;

@@ -3,10 +3,10 @@ package com.app.calingaertextend.processadordemacros;
 import java.io.*;
 import java.util.*;
 
-// Classe que lê o arquivo e classifica cada linha
-public class Leitor {
-    private List<ListaAsm> linhasFeitas = new ArrayList<>();
-    private Set<String> macrosDefinidas = new HashSet<>();
+public class Leitor { 
+    
+    private final List<ListaAsm> linhasFeitas = new ArrayList<>();
+    private final Set<String> macrosDefinidas = new HashSet<>();
 
     public void lerArquivo(String caminho) {
         int nivelAninhamento = 0;
@@ -16,8 +16,17 @@ public class Leitor {
             String linhaOriginal;
 
             while ((linhaOriginal = br.readLine()) != null) {
-                String linhaProcessada = linhaOriginal.trim();
-                if (linhaProcessada.isEmpty() || linhaProcessada.startsWith("*")) {
+                String linhaProcessada = linhaOriginal;
+
+                // Etapa 1: Remover o comentário ANTES de qualquer processamento
+                int commentIndex = linhaProcessada.indexOf('*');
+                if (commentIndex != -1) {
+                    linhaProcessada = linhaProcessada.substring(0, commentIndex);
+                }
+
+                linhaProcessada = linhaProcessada.trim();
+
+                if (linhaProcessada.isEmpty()) {
                     continue; 
                 }
 
@@ -29,48 +38,34 @@ public class Leitor {
                     tipo = "inicio_macro";
                     nivelAninhamento++;
                     aguardandoCabecalho = true;
-
                 } else if (primeiraPalavra.equals("MEND")) {
                     tipo = "fim_macro";
-
                     if (nivelAninhamento > 0) {
                         nivelAninhamento--;
                     }
                     aguardandoCabecalho = false;
-
                 } else if (nivelAninhamento > 0 && aguardandoCabecalho) {
                     tipo = "cabecalho_macro";
-                    
-                    String nomeMacroAtual;
-                    if (tokens.length > 1 && tokens[0].startsWith("&")) {
-                        nomeMacroAtual = tokens[1];
-                    } else {
-                        nomeMacroAtual = tokens[0];
-                    }
+                    String nomeMacroAtual = tokens.length > 1 && tokens[0].startsWith("&") ? tokens[1] : tokens[0];
                     macrosDefinidas.add(nomeMacroAtual);
                     aguardandoCabecalho = false;
-
                 } else if (nivelAninhamento > 0) {
                     tipo = "codigo_macro";
-
-                } else if (macrosDefinidas.contains(primeiraPalavra)) {
+                } else if (macrosDefinidas.contains(primeiraPalavra) || (tokens.length > 1 && macrosDefinidas.contains(tokens[1]))) {
                     tipo = "chamada_macro";
-
-                } else if (tokens.length > 1 && macrosDefinidas.contains(tokens[1])) {
-                    tipo = "chamada_macro";
-
                 } else {
                     tipo = "codigo";
                 }
 
-                linhasFeitas.add(new ListaAsm(linhaOriginal, tipo));
+                // Adiciona a linha JÁ PROCESSADA E LIMPA ao objeto.
+                linhasFeitas.add(new ListaAsm(linhaProcessada, tipo));
             }
 
         } catch (IOException e) {
             System.err.println("Erro ao ler o arquivo: " + e.getMessage());
         }
 
-        // Exibe as linhas classificadas para verificação
+        // A depuração no console
         System.out.println("\n<<<< Linhas classificadas pelo Leitor >>>>");
         for (ListaAsm linha : linhasFeitas) {
             System.out.println(String.format("%-18s -> %s", linha.getTipo(), linha.getConteudo()));
