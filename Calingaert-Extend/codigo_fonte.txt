@@ -1,0 +1,14 @@
+* Teste de manipulacao da pilha com PUSH e POP
+START STACK_TEST
+    LOAD    VALOR     * ACC = 77
+    STORE   TEMP      * Salva o valor em uma variavel
+    PUSH    TEMP      * Empilha o valor de TEMP (77)
+    LOAD    ZERO      * Zera o ACC para provar que o valor sera recuperado
+    POP     DESTINO   * Desempilha o valor (77) para a variavel DESTINO
+    WRITE   DESTINO   * Escreve o valor recuperado. Deve ser 77
+    STOP
+
+VALOR   CONST   77
+ZERO    CONST   0
+TEMP    SPACE
+DESTINO SPACE

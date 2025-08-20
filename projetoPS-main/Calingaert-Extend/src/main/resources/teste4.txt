@@ -1,0 +1,23 @@
+START PROGRAMA
+
+* Lê os valores
+        READ   A
+        READ  B
+        ADD A B
+
+* Carrega A, multiplica por B e guarda em C
+        LOAD A
+        MULT B
+        STORE C
+
+* Escreve o resultado
+        WRITE C
+
+        STOP
+
+* Declarações de memória
+A       SPACE
+B       SPACE
+C       SPACE
+
+        END
