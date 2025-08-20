@@ -3,10 +3,9 @@
 #### Grupo composto por: Felipe Veloso, Gabriel Kuster de Azevedo, Junior Prediger, Luana Montilha, Luiz Kolosque, Matheus Zehetmeyr, Rodrigo Iasculaski.
 
 ## Como compilar: 
-#### Instale o JavaFX: https://gluonhq.com/products/javafx/
-#### Extraia para o diretorio de sua preferencia!
+#### Instale o Maven no seu computador: https://maven.apache.org/download.cgi
+#### Adicione o caminho do Maven em suas variaveis de ambiente
 
-#### Navegue até o diretorio da pasta Calingaert-Extend
-##### javac --module-path "DIRETORIO DA PASTA JAVAFX" --add-modules javafx.controls,javafx.fxml -d out src\main\java\com\app\calingaertextend\*.java
-##### xcopy src\main\resources out /E /I /Y
-##### java --module-path "DIRETORIO DA PASTA JAVAFX" --add-modules javafx.controls,javafx.fxml -cp out com.app.calingaertextend.Main
+#### Navegue até o diretorio da pasta Calingaert-Extend, onde está localizado o arquivo pom.xml. Após isso:
+##### mvn clean install
+#####  mvn javafx:run
