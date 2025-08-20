@@ -130,14 +130,6 @@ class Instrucoes {
                 registrador.setPC(registrador.getPC() + 2);
                 break;
             }
-            case 19: { // SHIFTR (Shift Right)
-                int valorAcumulador = registrador.getACC();
-                // O operando (op1) é o valor literal que indica a quantidade de bits a serem deslocados.
-                int bitsADeslocar = op1; 
-                registrador.setACC(valorAcumulador >> bitsADeslocar);
-                registrador.setPC(registrador.getPC() + 2);
-                break;
-            }
             default:
                  System.err.println("Opcode base desconhecido encontrado: " + opcodeBase + ". Execução interrompida.");
                  executor.pararExecucao();
