@@ -7,5 +7,5 @@
 #### Adicione o caminho do Maven em suas variaveis de ambiente
 
 #### Navegue até o diretorio da pasta Calingaert-Extend, onde está localizado o arquivo pom.xml. Após isso:
-##### mvn clean install
-#####  mvn javafx:run
+##### -> mvn clean install
+##### -> mvn javafx:run
