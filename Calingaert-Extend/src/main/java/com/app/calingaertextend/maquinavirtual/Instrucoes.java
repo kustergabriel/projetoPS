@@ -66,8 +66,8 @@ class Instrucoes {
             }
             case 8: { // WRITE
                 int valor = ModosEnderecamento.resolveOperando(opcode, op1, memoria,true,true);
-                System.out.println("Saída: " + valor);
-                registrador.setPC(registrador.getPC() + 2);
+                System.out.println("DEBUG: Instrução WRITE executada. Valor escrito: " + valor);
+
                 break;
             }
             case 10: { // DIVIDE
@@ -127,6 +127,14 @@ class Instrucoes {
                 registrador.setSP(registrador.getSP() - 1);
                 int valorPop = pilha.getPosicaoPilha(registrador.getSP());
                 memoria.setPosicaoMemoria(op1, valorPop); // POP para um endereço de memória
+                registrador.setPC(registrador.getPC() + 2);
+                break;
+            }
+            case 19: { // SHIFTR (Shift Right)
+                int valorAcumulador = registrador.getACC();
+                // O operando (op1) é o valor literal que indica a quantidade de bits a serem deslocados.
+                int bitsADeslocar = op1; 
+                registrador.setACC(valorAcumulador >> bitsADeslocar);
                 registrador.setPC(registrador.getPC() + 2);
                 break;
             }

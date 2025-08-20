@@ -69,7 +69,6 @@ public class Main extends Application {
             Map<String, Integer> tabelaGlobal = new LigadorPrimeiraPassagem().executarPassagem(modulosObjeto);
             new LigadorSegundaPassagem(tabelaGlobal).executarPassagem(modulosObjeto, arquivoExecutavel);
 
-            // *** CORREÇÃO APLICADA AQUI ***
             // Exibe o conteúdo do arquivo final e limpo (programa.hpx)
             final String codigoFinalStr = Files.readString(java.nio.file.Paths.get(arquivoExecutavel));
             Platform.runLater(() -> controller.atualizarCodigoMontado(codigoFinalStr));
@@ -88,7 +87,6 @@ public class Main extends Application {
             executor = new Executor(memoria, registradores, pilha);
             executor.setController(controller);
 
-            // *** CORREÇÃO APLICADA AQUI ***
             // Carrega o arquivo final e limpo (programa.hpx) para a memória
             String arquivoExecutavel = "programa.hpx";
             List<String> linhasDoExecutavel = Files.readAllLines(java.nio.file.Paths.get(arquivoExecutavel));
