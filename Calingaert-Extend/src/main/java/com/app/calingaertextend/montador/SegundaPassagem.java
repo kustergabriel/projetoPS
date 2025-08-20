@@ -104,20 +104,36 @@ public class SegundaPassagem {
                     linhaCodigo.append(String.format("%02d", opcode));
 
                     for (String operando : operandos) {
-                        Simbolos simbolo = tabelaSimbolos.buscarSimbolo(operando);
-                        if (simbolo != null) {
-                            linhaCodigo.append(" ").append(String.format("%02d", simbolo.getEndereco()));
-                            mapaDeRelocacao.add(1);
-                            // se o símbolo for global, coloca nos globais
-                            if (simbolo.isGlobal()) {
-                                simbolosGlobais.put(simbolo.getRotulo(), simbolo.getEndereco());
-                            }
-                        } else {
-                            simbolosExternos.add(operando);
-                            linhaCodigo.append(" ??");
-                            mapaDeRelocacao.add(1);
-                        }
-                    }
+    // 1. Tenta verificar se o operando é um número literal (valor imediato)
+    try {
+        int valorImediato = Integer.parseInt(operando);
+        // Se a conversão funcionou, é um número.
+        linhaCodigo.append(" ").append(String.format("%02d", valorImediato));
+        // Valores imediatos são absolutos, então o bit de relocação é 0.
+        mapaDeRelocacao.add(0); 
+
+    } catch (NumberFormatException e) {
+        // 2. Se não é um número, então deve ser um símbolo.
+        // Procura o símbolo na tabela.
+        Simbolos simbolo = tabelaSimbolos.buscarSimbolo(operando);
+        if (simbolo != null) {
+            // Símbolo foi encontrado.
+            linhaCodigo.append(" ").append(String.format("%02d", simbolo.getEndereco()));
+            // Endereços de símbolos são relativos/relocáveis, então o bit é 1.
+            mapaDeRelocacao.add(1); 
+            
+            if (simbolo.isGlobal()) {
+                simbolosGlobais.put(simbolo.getRotulo(), simbolo.getEndereco());
+            }
+        } else {
+            // 3. Se não é um número E não está na tabela, então é um erro ou um símbolo externo.
+            // Aqui, manter o comportamento de ?? é correto para símbolos realmente não definidos.
+            simbolosExternos.add(operando);
+            linhaCodigo.append(" ??");
+            mapaDeRelocacao.add(1);
+        }
+    }
+}
                     codigoObjeto.add(linhaCodigo.toString());
                 }
             }
