@@ -125,15 +125,15 @@ public class SegundaPassagem {
             if (simbolo.isGlobal()) {
                 simbolosGlobais.put(simbolo.getRotulo(), simbolo.getEndereco());
             }
-        } else {
-            // 3. Se não é um número E não está na tabela, então é um erro ou um símbolo externo.
-            // Aqui, manter o comportamento de ?? é correto para símbolos realmente não definidos.
-            simbolosExternos.add(operando);
-            linhaCodigo.append(" ??");
-            mapaDeRelocacao.add(1);
-        }
-    }
-}
+            } else {
+                // 3. Se não é um número E não está na tabela, então é um erro ou um símbolo externo.
+                // Aqui, manter o comportamento de ?? é correto para símbolos realmente não definidos.
+                simbolosExternos.add(operando);
+                linhaCodigo.append(" ??");
+                mapaDeRelocacao.add(1);
+                }
+            }
+                }
                     codigoObjeto.add(linhaCodigo.toString());
                 }
             }

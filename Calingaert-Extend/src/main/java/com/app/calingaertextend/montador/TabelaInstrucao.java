@@ -75,7 +75,6 @@ public class TabelaInstrucao {
     }
 
     /**
-     * ✅ MÉTODO ATUALIZADO E SIMPLIFICADO
      * Retorna o tamanho em "palavras" de uma instrução ou diretiva.
      * É usado pela Primeira Passagem para incrementar o locctr corretamente.
      * @param instrucao O nome da instrução ou diretiva (ex: "LOAD", "SPACE", "CONST").

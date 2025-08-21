@@ -64,10 +64,13 @@ class Instrucoes {
                 registrador.setPC(registrador.getPC() + 2);
                 break;
             }
-            case 8: { // WRITE
+            case 8: { // TESTADO
+                //WRITE, aqui a gente escreve na saída (output = Op1)
                 int valor = ModosEnderecamento.resolveOperando(opcode, op1, memoria,true,true);
-                System.out.println("DEBUG: Instrução WRITE executada. Valor escrito: " + valor);
+                System.out.println("Saída: " + valor); // IMPRIMIR NA INTERFACE!!!!!
+                System.out.println("PC: " + registrador.getPC()); // APENAS DEBUG
 
+                registrador.setPC(registrador.getPC() + 2);
                 break;
             }
             case 10: { // DIVIDE

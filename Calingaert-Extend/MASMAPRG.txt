@@ -4,24 +4,21 @@ READ        B
 READ        C
 LOAD        A
 MULT        C
-SHIFTR      3
 STORE       TEMP1
 LOAD        TEMP1
-MULT        4
-SHIFTR      3
+MULT        B
 STORE       TEMP1
 LOAD        A
 MULT        B
-SHIFTR      3
 STORE       TEMP2
 SUB         TEMP1
 STORE       D
 WRITE       D
 STOP
-A       SPACE
-B       SPACE
-C       SPACE
-D       SPACE
+A       CONST 1
+B       CONST 5
+C       CONST 2
+D       CONST 5
 TEMP1   SPACE
 TEMP2   SPACE
 END
