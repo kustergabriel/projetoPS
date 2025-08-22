@@ -1,2 +1,0 @@
-LOAD &A
-ADD &var1 &var2
