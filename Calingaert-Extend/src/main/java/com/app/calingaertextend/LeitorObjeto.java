@@ -10,7 +10,6 @@ import java.util.Map;
 
 public class LeitorObjeto {
 
-    // Classe interna para representar um módulo objeto completo
     public static class ModuloObjeto {
         public int tamanho;
         public int enderecoInicial;
@@ -55,7 +54,6 @@ public class LeitorObjeto {
                     continue;
                 }
 
-                // Preenche as estruturas com base na seção atual
                 switch (secaoAtual) {
                     case "GLOBAIS":
                         String[] partesGlobais = linha.split("\\s+");

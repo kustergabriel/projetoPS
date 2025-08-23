@@ -5,8 +5,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-//Responsável pela Tarefa 4: Escrever o código final expandido no arquivo MASMAPRG.ASM.
-
 public class EscritorDeArquivo {
 
     public void escreverArquivo(String caminhoDoArquivo, List<String> linhasParaEscrever) {

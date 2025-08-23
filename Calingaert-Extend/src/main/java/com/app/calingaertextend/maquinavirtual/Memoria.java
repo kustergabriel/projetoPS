@@ -13,15 +13,17 @@ public class Memoria{
 	}
 
 	public void setPosicaoMemoria (int posicao, int valor) throws AcessoIndevidoAMemoriaCheckedException{
+		int index = posicao + 2;
 		if(posicao >= 0 && posicao < tamanho)
-			memoria[posicao] = valor;
+			memoria[index] = valor;
 		else
 			throw new AcessoIndevidoAMemoriaCheckedException("Tentativa de acesso a memoria invalida.");
 	}
 
 	public int getPosicaoMemoria (int posicao) throws AcessoIndevidoAMemoriaCheckedException{
+		int index = posicao + 2;
 		if(posicao >= 0 && posicao < tamanho)
-			return memoria[posicao];
+			return memoria[index];
 		else
 			throw new AcessoIndevidoAMemoriaCheckedException("Tentativa de acesso a memoria invalida.");
 	}

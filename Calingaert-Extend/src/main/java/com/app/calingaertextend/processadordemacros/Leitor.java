@@ -18,7 +18,6 @@ public class Leitor {
             while ((linhaOriginal = br.readLine()) != null) {
                 String linhaProcessada = linhaOriginal;
 
-                // Etapa 1: Remover o comentário ANTES de qualquer processamento
                 int commentIndex = linhaProcessada.indexOf('*');
                 if (commentIndex != -1) {
                     linhaProcessada = linhaProcessada.substring(0, commentIndex);
@@ -57,7 +56,6 @@ public class Leitor {
                     tipo = "codigo";
                 }
 
-                // Adiciona a linha JÁ PROCESSADA E LIMPA ao objeto.
                 linhasFeitas.add(new ListaAsm(linhaProcessada, tipo));
             }
 
@@ -65,7 +63,6 @@ public class Leitor {
             System.err.println("Erro ao ler o arquivo: " + e.getMessage());
         }
 
-        // A depuração no console
         System.out.println("\n<<<< Linhas classificadas pelo Leitor >>>>");
         for (ListaAsm linha : linhasFeitas) {
             System.out.println(String.format("%-18s -> %s", linha.getTipo(), linha.getConteudo()));

@@ -25,21 +25,19 @@ public class Executor {
             int opcode = memoria.getPosicaoMemoria(pc);
 
             registradores.setRI(opcode);
-
-            // STOP (opcode 11) é um caso especial, finaliza o loop
+            
             if (opcode == 11) {
                 Instrucoes.executar(opcode, 0, 0, registradores, memoria, this, pilha);
-                continue; // Sai da iteração atual e a condição do while falhará
+                continue; 
             }
 
             int op1 = 0;
             int op2 = 0;
 
-            // Busca operandos com base no opcode
-            if (opcode == 13) { // COPY tem 2 operandos
+            if (opcode == 13) { 
                 op1 = memoria.getPosicaoMemoria(pc + 1);
                 op2 = memoria.getPosicaoMemoria(pc + 2);
-            } else if (opcode != 16) { // RET não tem operandos
+            } else if (opcode != 16) { 
                 op1 = memoria.getPosicaoMemoria(pc + 1);
             }
 
@@ -47,7 +45,6 @@ public class Executor {
             Instrucoes.executar(opcode, op1, op2, registradores, memoria, this, pilha);
         }
 
-        // Após a execução, atualiza a UI
         Platform.runLater(() -> {
             controller.atualizarTabela(registradores);
             controller.atualizarTabelaMemoria(memoria.getMemoria());
@@ -62,6 +59,8 @@ public class Executor {
         this.controller = controller;
     }
     
-    // Manter os outros getters que possam existir
-    public Memoria getMemoria() { return memoria; }
+    public Memoria getMemoria() { 
+        return memoria; 
+    }
+    
 }

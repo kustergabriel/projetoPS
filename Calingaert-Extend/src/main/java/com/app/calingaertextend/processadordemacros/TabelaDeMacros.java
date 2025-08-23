@@ -75,6 +75,8 @@ public class TabelaDeMacros {
         return macros;
     }
 
+
+    
 public class MacroBuilder {
     private String nome;
     private List<String> parametros = new ArrayList<>();
@@ -88,7 +90,6 @@ void setCabecalho(String[] tokens, String conteudoOriginal) {
 
     List<String> tokensComoLista = new ArrayList<>(Arrays.asList(tokens));
     
-    // Identifica o nome e remove da lista de tokens, sobrando apenas os parâmetros
     if (tokens.length > 1 && tokens[0].startsWith("&")) {
         this.nome = tokens[1];
         tokensComoLista.remove(1); // Remove o nome
@@ -97,7 +98,6 @@ void setCabecalho(String[] tokens, String conteudoOriginal) {
         tokensComoLista.remove(0); // Remove o nome
     }
 
-    // Itera nos tokens que sobraram (que são os parâmetros) e os limpa
     for (String tokenParametro : tokensComoLista) {
         String parametroLimpo = tokenParametro.replace(",", "");
         this.parametros.add(parametroLimpo);

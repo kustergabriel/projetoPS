@@ -1,13 +1,12 @@
 package com.app.calingaertextend.montador;
 
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
 public class PrimeiraPassagem {
 
-    private boolean emEscopoLocal = false; // Variável para controlar o escopo local
+    private boolean emEscopoLocal = false; 
 
     public void primeirapassagem(String caminhoArquivo, TabelaDeSimbolos tabelaSimbolos, TabelaInstrucao tabelaInstrucao) {
 
@@ -25,7 +24,6 @@ public class PrimeiraPassagem {
                 // Ignora linhas vazias ou de comentário.
                 linhaAtual++;
                 
-                // Remove o comentário em linha ANTES de qualquer outra coisa
                 int commentIndex = linha.indexOf('*');
                 if (commentIndex != -1) {
                     linha = linha.substring(0, commentIndex);
@@ -37,10 +35,8 @@ public class PrimeiraPassagem {
                     continue;
                 }
 
-                // DEBUG: Imprime a linha que está a ser processada.
                 System.out.println("\n[Linha " + linhaAtual + "]: '" + linha + "' | locctr atual = " + locctr);
 
-                // Lógica para pular o conteúdo das definições de macro.
                 if (linha.toUpperCase().startsWith("MACRO")) {
                     emDefinicaoDeMacro = true;
                     System.out.println("  -> Detectado início de MACRO. A ignorar conteúdo.");
@@ -55,7 +51,6 @@ public class PrimeiraPassagem {
                     continue;
                 }
 
-                // Divide a linha em partes (tokens) para análise.
                 String[] partes = linha.split("\\s+");
                 String rotulo = null;
                 String instrucaoOuDiretiva = null;
@@ -70,7 +65,6 @@ public class PrimeiraPassagem {
                     instrucaoOuDiretiva = partes[0].toUpperCase();
                 }
 
-                // Verifica se estamos iniciando ou terminando um escopo local
                 if (instrucaoOuDiretiva != null) {
                     if (instrucaoOuDiretiva.equals("PROC")) {
                         emEscopoLocal = true; // Entrando em um escopo local
@@ -79,13 +73,11 @@ public class PrimeiraPassagem {
                     }
                 }
 
-                // Bloco de segurança para corrigir má identificação de START/END.
                 if (rotulo != null && (rotulo.equalsIgnoreCase("START") || rotulo.equalsIgnoreCase("END"))) {
                     instrucaoOuDiretiva = rotulo.toUpperCase();
                     rotulo = null;
                 }
 
-                // Trata as diretivas de controle START e END.
                 if (instrucaoOuDiretiva != null) {
                     if (instrucaoOuDiretiva.equals("START")) {
                         System.out.println("  -> Processando diretiva START.");
@@ -106,7 +98,6 @@ public class PrimeiraPassagem {
                     }
                 }
 
-                // Adiciona o rótulo (se existir) na Tabela de Símbolos com o endereço ATUAL.
                 if (rotulo != null) {
                     boolean isGlobal = !emEscopoLocal; // Se não estamos em um escopo local, é global
                     if (!tabelaSimbolos.contemSimbolo(rotulo)) {
@@ -117,7 +108,6 @@ public class PrimeiraPassagem {
                     }
                 }
 
-                // Lógica de incremento final
                 if (instrucaoOuDiretiva != null) {
                     int tamanho = tabelaInstrucao.getInstructionSize(instrucaoOuDiretiva);
                     if (tamanho > 0) {
@@ -126,7 +116,7 @@ public class PrimeiraPassagem {
                     }
                 }
 
-            } // Fim do while
+            } 
 
         } catch (IOException e) {
             System.err.println("Erro ao ler o ficheiro: " + e.getMessage());
@@ -137,7 +127,6 @@ public class PrimeiraPassagem {
             e.printStackTrace();
         }
 
-        // Impressão final da Tabela de Símbolos para verificação.
         System.out.println("\n--- Tabela de Símbolos (Resultado da Primeira Passagem) ---");
         tabelaSimbolos.imprimirTabela();
         System.out.println("---------------------------------------------------------");
